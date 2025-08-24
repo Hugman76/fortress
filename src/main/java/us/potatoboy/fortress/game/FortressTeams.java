@@ -1,12 +1,10 @@
 package us.potatoboy.fortress.game;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.BlockPredicatesComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.predicate.BlockPredicate;
-import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.scoreboard.AbstractTeam;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -15,10 +13,8 @@ import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.random.Random;
 import us.potatoboy.fortress.custom.item.ModuleItem;
 import xyz.nucleoid.plasmid.api.game.GameActivity;
-import xyz.nucleoid.plasmid.api.game.common.team.GameTeam;
-import xyz.nucleoid.plasmid.api.game.common.team.GameTeamConfig;
-import xyz.nucleoid.plasmid.api.game.common.team.GameTeamKey;
-import xyz.nucleoid.plasmid.api.game.common.team.TeamManager;
+import xyz.nucleoid.plasmid.api.game.common.team.*;
+import xyz.nucleoid.plasmid.api.game.common.team.provider.DefaultTeamLists;
 import xyz.nucleoid.plasmid.api.util.ColoredBlocks;
 
 import java.util.List;
@@ -40,34 +36,17 @@ public class FortressTeams {
             .setCollision(AbstractTeam.CollisionRule.NEVER)
             .build()
     );
-
-    @Deprecated
-    public static final TeamPallet TEAM_1_PALLET = new TeamPallet(
-            ColoredBlocks.concrete(DyeColor.RED),
-            ColoredBlocks.terracotta(DyeColor.RED),
-            ColoredBlocks.glass(DyeColor.RED),
-            Blocks.CRIMSON_PLANKS,
-            Blocks.CRIMSON_STAIRS,
-            Blocks.CRIMSON_SLAB
-    );
-
-    @Deprecated
-    public static final TeamPallet TEAM_2_PALLET = new TeamPallet(
-            ColoredBlocks.concrete(DyeColor.BLUE),
-            ColoredBlocks.terracotta(DyeColor.BLUE),
-            ColoredBlocks.glass(DyeColor.BLUE),
-            Blocks.WARPED_PLANKS,
-            Blocks.WARPED_STAIRS,
-            Blocks.WARPED_SLAB
-    );
-
     private TeamManager manager;
     private final GameTeam team1;
     private final GameTeam team2;
+    private final TeamPallet team1Pallet;
+    private final TeamPallet team2Pallet;
 
-    public FortressTeams() {
-        this.team1 = TEAM_1;
-        this.team2 = TEAM_2;
+    public FortressTeams(List<GameTeam> teamList) {
+        this.team1 = teamList.get(0);
+        this.team2 = teamList.get(1);
+        this.team1Pallet = TeamPallet.of(team1.config().blockDyeColor());
+        this.team2Pallet = TeamPallet.of(team2.config().blockDyeColor());
     }
 
     public GameTeam getTeam1() {
@@ -79,11 +58,11 @@ public class FortressTeams {
     }
 
     public TeamPallet getTeam1Pallet() {
-        return TEAM_1_PALLET;
+        return team1Pallet;
     }
 
     public TeamPallet getTeam2Pallet() {
-        return TEAM_2_PALLET;
+        return team2Pallet;
     }
 
     public void applyTo(GameActivity game) {
@@ -124,9 +103,9 @@ public class FortressTeams {
 
         BlockPredicate.Builder predicateBuilder = BlockPredicate.Builder.create();
         if (team == this.team1.key()) {
-            predicateBuilder.blocks(blockRegistry, Blocks.RED_CONCRETE, Blocks.RED_TERRACOTTA);
+            predicateBuilder.blocks(blockRegistry, ColoredBlocks.concrete(team1.config().blockDyeColor()), ColoredBlocks.terracotta(team1.config().blockDyeColor()));
         } else {
-            predicateBuilder.blocks(blockRegistry, Blocks.BLUE_CONCRETE, Blocks.BLUE_TERRACOTTA);
+            predicateBuilder.blocks(blockRegistry, ColoredBlocks.concrete(team2.config().blockDyeColor()), ColoredBlocks.terracotta(team2.config().blockDyeColor()));
         }
 
         moduleStack.set(DataComponentTypes.CAN_PLACE_ON, new BlockPredicatesComponent(List.of(predicateBuilder.build())));

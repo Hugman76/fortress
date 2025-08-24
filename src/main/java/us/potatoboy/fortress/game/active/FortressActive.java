@@ -130,11 +130,11 @@ public class FortressActive {
 
             builder.add(player -> {
                 Pair<Integer, Integer> percents = map.getControlPercent();
-                return TextUtil.getText("sidebar", "percent.red", Text.literal(percents.getLeft().toString() + "%").formatted(Formatting.GREEN)).formatted(Formatting.RED);
+                return TextUtil.getText("sidebar", "percent", teams.getTeam1().config().name(), Text.literal(percents.getLeft().toString() + "%").formatted(Formatting.GREEN));
             });
             builder.add(player -> {
                 Pair<Integer, Integer> percents = map.getControlPercent();
-                return TextUtil.getText("sidebar", "percent.blue", Text.literal(percents.getRight().toString() + "%").formatted(Formatting.GREEN)).formatted(Formatting.BLUE);
+                return TextUtil.getText("sidebar", "percent", teams.getTeam2().config().name(), Text.literal(percents.getLeft().toString() + "%").formatted(Formatting.GREEN));
             });
 
             builder.add(Text.empty());
